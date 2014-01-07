@@ -1,0 +1,423 @@
+<!-- TODO
+ - Add metric formula and calculation
+ - Add facebook and square data
+ - Re-organize code to make the sections to fill out by students clear.
+ -->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:m="http://www.w3.org/1998/Math/MathML">
+<head>
+  <title>DIY K-means</title>
+  <link rel="stylesheet" href="https://rawgithub.com/yannickulrich/presenter/master/lib/jqMath/UnifrakturMaguntia.css">
+  <link rel="stylesheet" href="https://rawgithub.com/yannickulrich/presenter/master/lib/jqMath/jqmath-0.4.0.css">
+
+  <script src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
+  <script src="https://rawgithub.com/yannickulrich/presenter/master/lib/jqMath/jqmath-etc-0.4.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+  <style>
+    line {
+      stroke-width: .4px;
+    }
+
+    body {
+      background-image: url("greyzz_@2X.png");
+      padding: 0px 50px;
+    }
+
+    svg {
+      border: groove;
+      background-color: white;
+      width: 100%;
+    }
+
+    #graph-container {
+      width: 100%;
+      /*height: 500px;*/
+    }
+
+    #graph-col {
+      width: 70%;
+      float: left;
+    }
+
+    #steps-col > .btn-group-vertical {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    #steps-col {
+      width: 25%;
+      float: left;
+      /*display: table;*/
+      height: 100%;
+      margin-left: 10px;
+
+    }
+
+    #setup-bar, #data-bar {
+      height: 50px;
+      padding-top: 10px;
+      width: 100%;
+    }
+
+    .btn-group-justify {
+      text-align: justify;
+    }
+
+    .btn-group-justify:first-child{
+      margin-left: 30px;
+    }
+
+    .btn-group-justify:last-child{
+      margin-right: 30px;
+    }
+
+    .btn-group-justify:after {
+        content:""; 
+        display:inline-block;
+        width:100%
+    }
+
+    path.line {
+      fill: none;
+      stroke: #666;
+      stroke-width: 1.5px;
+    }
+
+    .axis {
+      shape-rendering: crispEdges;
+    }
+
+    .axis line, .axis path {
+      fill: none;
+      stroke: #000;
+    }
+
+    .axis text {
+      display: none;
+    }
+
+    h1 {
+      color: gray;
+      text-align: center;
+      font-size: 50px;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="title-bar">
+    <h1><em>Do-it-yourself K-means Clustering<em></h1>
+  </div>
+  <div id="graph-container">
+    <div id="graph-col">
+      <div id="setup-bar">
+        <div class="btn-group-justify">
+          <button id="reset" type="button" class="btn btn-primary">Reset</button>
+          <button id="add-centroid" type="button" class="btn btn-primary">Add Centroid</button>
+          <button id="remove-centroid" type="button" class="btn btn-primary">Remove Centroid</button>
+        </div>
+      </div>
+      <div id="data-bar">
+        <div class="btn-group-justify">
+          <button id="random-data" type="button" class="btn btn-info">Generate Random Data</button>
+          <button id="fb-data" type="button" class="btn btn-info">Load Facebook Data</button>
+          <button id="square-data" type="button" class="btn btn-info">Load Square Data</button>
+        </div>
+      </div>
+    </div>
+    <div id="steps-col">
+      <h3> Algorithm steps: </h3>
+      <div class="btn-group-vertical">
+        <button id="assign" type="button" class="btn btn-success">Assign Centroids to Points</button>
+        <button id="update" type="button" class="btn btn-success">Update Centroids</button>
+      </div>
+      <h3> Algorithm metric: </h3>
+      <!-- <fmath alttext="∑↙{k=1}↖K ∑↙{x_i∈c_k}  {‖ x_i - μ_k ‖^2}" class="fm-inline"><mrow class="ma-repel-adj"><span mtagname="munderover" class="fm-prefix" style="vertical-align: 0.064em;"><span class="fm-vert"><table><tbody><tr><td class="fm-script fm-inline"><mi class="fm-mi-length-1" mathvariant="italic" style="padding-right: 0.44ex;">K</mi></td></tr><tr><td class="fm-underover-base"><mo class="fm-large-op">∑</mo></td></tr><tr><td class="fm-script fm-inline"><mrow><mi class="fm-mi-length-1" mathvariant="italic">k</mi><mo class="fm-infix-loose">=</mo><mn>1</mn></mrow></td></tr></tbody></table></span></span><mrow class="ma-repel-adj"><span mtagname="munder" class="fm-prefix" style="vertical-align: -0.452em;"><span class="fm-vert"><table><tbody><tr><td class="fm-underover-base"><mo class="fm-large-op">∑</mo></td></tr><tr><td class="fm-script fm-inline"><mrow><msub><mi class="fm-mi-length-1" mathvariant="italic">x</mi><span class="fm-script fm-inline" style="vertical-align: -0.5em;"><mi class="fm-mi-length-1" mathvariant="italic">i</mi></span></msub><mo class="fm-infix-loose">∈</mo><msub><mi class="fm-mi-length-1" mathvariant="italic">c</mi><span class="fm-script fm-inline" style="vertical-align: -0.5em;"><mi class="fm-mi-length-1" mathvariant="italic">k</mi></span></msub></mrow></td></tr></tbody></table></span></span><msup><mrow><mo class="fm-mo-Luc">‖</mo><mrow><msub><mi class="fm-mi-length-1" mathvariant="italic">x</mi><span class="fm-script fm-inline" style="vertical-align: -0.5em;"><mi class="fm-mi-length-1" mathvariant="italic">i</mi></span></msub><mo class="fm-infix">−</mo><msub><mi class="fm-mi-length-1" mathvariant="italic">μ</mi><span class="fm-script fm-inline" style="vertical-align: -0.5em;"><mi class="fm-mi-length-1" mathvariant="italic">k</mi></span></msub></mrow><mo class="fm-mo-Luc">‖</mo></mrow><span class="fm-script fm-inline" style="vertical-align: 0.7em;"><mn>2</mn></span></msup></mrow></mrow></fmath> -->
+      <table><tr><td>
+        $∑↙{k=1}↖K ∑↙{x_i∈c_k}  {‖ x_i - μ_k ‖^2}$
+      </td></tr></table>
+    </div>
+  </div>
+  
+  <script src="http://rawgithub.com/jbeuckm/K-Means/master/build/kmeans.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script>
+
+    $(function(){
+      var graphColHeight = $('#graph-col').height();
+      $('#steps-col').height(graphColHeight);
+    });
+
+    var X_MAX = 10;
+    var Y_MAX = 10;
+
+    var centroids = [];
+    var points = randomData();
+
+    function Point(x, y, centroid) {
+      this.x = x;
+      this.y = y;
+      this.centroid = centroid;
+    }
+
+    Point.prototype.setCentroid = function(centroid) {
+      this.centroid = centroid;
+      // centroid.addPoint(this);
+    };
+
+    function Centroid(x, y, id) {
+      this.x = x;
+      this.y = y;
+      this.id = id;
+    }
+
+    // Generate normally distributed number from Box-Muller transform
+    function normal(mu, sigma) {
+      var u1 = Math.random();
+      var u2 = Math.random();
+      var theta = 2 * Math.PI * u2;
+      var r = Math.sqrt(-2 * Math.log(u1));
+      return r * Math.cos(theta) * sigma + mu;
+    }
+
+    function randomData(numClusters, numPoints) {
+      var SIGMA = 0.7;
+      if (numClusters === undefined) numClusters = _.random(3,5);
+      if (numPoints === undefined) numPoints = 1000;
+
+      var pointsPerCluster = Math.floor(numPoints / numClusters);
+
+      var clusterCenters = [];
+
+      var possibleClusterCenters = [];
+      for (var x = 1; x <= X_MAX -1; x+=2) {
+        for (var y = 1; y <= Y_MAX -1; y+=2) {
+          possibleClusterCenters.push({x: x, y: y});
+        }
+      }
+
+      for (var i = 0; i < numClusters; i++) {
+        var randomIndex = _.random(possibleClusterCenters.length -1);
+        clusterCenters.push(possibleClusterCenters.splice(randomIndex, 1)[0]);
+      }
+
+      var points = [];
+      for (var i = 0; i < clusterCenters.length; i++) {
+        var clusterCenter = clusterCenters[i];
+        for (var j = 0; j < pointsPerCluster; j++) {
+          var x = clusterCenter.x + normal(0, SIGMA);
+          var y = clusterCenter.y + normal(0, SIGMA);
+
+          if (x < 0 || x > X_MAX || y < 0 || y > Y_MAX) continue;
+
+          points.push(new Point(x, y));
+        }
+      };
+
+      //add a few randomly scattered points
+      for (var i = 0; i < numPoints / 5; i++) {
+        points.push(new Point(Math.random() * X_MAX, Math.random() * Y_MAX));
+      };
+
+      return points;
+    }
+
+    function addCentroid() {
+      var randomPoint = points[_.random(points.length - 1)];
+      centroids.push(new Centroid(randomPoint.x, randomPoint.y, centroids.length));
+      redraw();
+    }
+
+    function removeCentroid() {
+      centroids.pop();
+      redraw();
+    }
+
+    function reset() {
+      for (var i = points.length - 1; i >= 0; i--) {
+        points[i].centroid = undefined;
+      };
+      centroids = [];
+      redraw();
+    }
+
+    function assignCentroids() {
+      for (var i = points.length - 1; i >= 0; i--) {
+        var point = points[i];
+        point.setCentroid(closestCentroid(point));
+      };
+      redraw();
+    }
+
+    function updateCentroids() {
+      for (var i = centroids.length - 1; i >= 0; i--) {
+        var centroid = centroids[i];
+        var sumX = 0;
+        var sumY = 0;
+        var count = 0;
+        for (var j = 0; j < points.length; j++) {
+          point = points[j];
+          if (point.centroid === centroid) {   
+            var point = points[j];
+            sumX += point.x;
+            sumY += point.y;
+            count ++;
+          };
+        };
+        if (count > 0) {
+          centroid.x = sumX / count;
+          centroid.y = sumY / count;
+        };
+      };
+      redraw();
+    }
+
+    function distance (point, centroid) {
+      return (point.x - centroid.x) * (point.x - centroid.x) + (point.y - centroid.y) * (point.y - centroid.y);
+    }
+
+    function closestCentroid(point) {
+      var minDist = Infinity;
+      var closestCentroid;
+      for (var i = centroids.length - 1; i >= 0; i--) {
+        var centroid = centroids[i];
+        var dist = distance(point, centroid);
+        if (dist < minDist) {
+          minDist = dist;
+          closestCentroid = centroid;
+        }
+      };
+      return closestCentroid;
+    }
+
+    var X_WIDTH = $("#graph-col").width();
+    var Y_HEIGHT = 500;
+
+    var margin = {top: 19.5, right: 19.5, bottom: 39.5, left: 39.5},
+      width = X_WIDTH - margin.right - margin.left,
+      height = Y_HEIGHT - margin.top - margin.bottom;
+
+    //create the svg canvas
+    var svg = d3.select('#graph-col').insert('svg', ':first-child').attr('width',X_WIDTH).attr('height',Y_HEIGHT);
+
+    var xScale = d3.scale.linear().domain([0,X_MAX]).range([0,width]);
+    var yScale = d3.scale.linear().domain([0,Y_MAX]).range([0,height]);
+
+    // The x & y axes.
+    var xAxis = d3.svg.axis().orient("bottom").scale(xScale).ticks(10),
+        yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(10);
+
+    var xLabel = "x",
+        yLabel = "y";
+
+    var color = d3.scale.category10();
+
+    function redraw() {
+
+      //clear the whole canvas
+      $('svg').empty();
+
+      //draw points
+      var pointDots = svg.selectAll('.pointDots').data(points);
+      pointDots.enter().append('circle').attr('class','pointDots')
+        .attr('r', 2)
+        .attr('cx',function(d){ return xScale(d.x) + margin.left; })
+        .attr('cy',function(d){ return yScale(d.y) + margin.top; })
+        .attr('opacity', 0.5);
+
+      //draw centroids
+      var centroidDots = svg.selectAll('.centroidDots').data(centroids);
+      centroidDots.enter().append('circle').attr('class','pointDots')
+        .attr('r', 5)
+        .attr('cx',function(d){ return xScale(d.x)  + margin.left; })
+        .attr('cy',function(d){ return yScale(d.y) + margin.top; })
+        .attr('stroke', function(d) { return color(d.id); })
+        .attr('stroke-width', 3)
+        .attr('fill', 'white');
+
+      //color points
+      pointDots.attr('stroke', function(d) { return d.centroid === undefined ? 'black' : color(d.centroid.id); });
+
+      // Add the x-axis.
+      svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(" + margin.left + "," + (height + margin.top + 10) + ")")
+          .call(xAxis);
+
+      // Add the y-axis.
+      svg.append("g")
+          .attr("class", "y axis")
+          .attr("transform", "translate(" + (margin.left - 10) + "," + margin.top + ")")
+          .call(yAxis);
+
+      // // Add an x-axis label.
+      svg.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "end")
+          .attr("x", width + margin.left)
+          .attr("y", height + margin.top + 30)
+          .text(xLabel);
+
+      // // Add a y-axis label.
+      svg.append("text")
+          .attr("class", "y label")
+          .attr("text-anchor", "end")
+          .attr("y", 6)
+          .attr("x", - margin.top)
+          .attr("dy", ".75em")
+          .attr("transform", "rotate(-90)")
+          .text(yLabel);
+    }
+
+    redraw();
+
+
+    function loadRandom() {
+      points = randomData();
+      xLabel = "x";
+      yLabel = "y";
+      reset();
+      redraw();
+    }
+
+    function loadSquare() {
+      points = [];
+      xLabel = "xSquare";
+      yLabel = "ySquare";
+      reset();
+      redraw();
+    }
+
+    function loadFacebook() {
+      points = [];
+      xLabel = "xFacebook";
+      yLabel = "yFacebook";
+      reset();
+      redraw();
+    }
+
+    $('button#reset').click(reset);
+    $('button#add-centroid').click(addCentroid);
+    $('button#remove-centroid').click(removeCentroid);
+    $('button#update').click(updateCentroids);
+    $('button#assign').click(assignCentroids);
+    $('button#random-data').click(loadRandom);
+    $('button#fb-data').click(loadFacebook);
+    $('button#square-data').click(loadSquare);
+
+
+  </script>
+</body>
+</html>
