@@ -189,7 +189,7 @@ function loadRandom() {
 }
 
 function loadSquare() {
-  points = [];
+  points = squarePoints;
   xLabel = "xSquare";
   yLabel = "ySquare";
   reset();
@@ -197,9 +197,17 @@ function loadSquare() {
 }
 
 function loadFacebook() {
-  points = [];
+  points = facebookPoints;
   xLabel = "xFacebook";
   yLabel = "yFacebook";
+  reset();
+  redraw();
+}
+
+function loadExample() {
+  points = examplePoints;
+  xLabel = "x";
+  yLabel = "y";
   reset();
   redraw();
 }
