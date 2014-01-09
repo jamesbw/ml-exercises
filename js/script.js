@@ -198,8 +198,8 @@ function loadSquare() {
 
 function loadFacebook() {
   points = facebookPoints;
-  xLabel = "xFacebook";
-  yLabel = "yFacebook";
+  xLabel = "Likes";
+  yLabel = "Posts";
   reset();
   redraw();
 }
