@@ -10,15 +10,6 @@ function Point(x, y, centroid) {
   this.centroid = centroid;
 }
 
-//These accessors are not really needed, but make the Point API a bit clearer for the purpose of the exercise
-Point.prototype.setCentroid = function(centroid) {
-  this.centroid = centroid;
-};
-
-Point.prototype.getCentroid = function() {
-  return this.centroid;
-};
-
 /* A Centroid has a position defined by x,y.
   Centroids are created and removed by clicking on the Add Centroid and Remove Centroid buttons.
   You shouldn't need to call new Centroid(...).

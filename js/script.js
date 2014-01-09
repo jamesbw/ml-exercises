@@ -88,7 +88,7 @@ function updateMetric() {
   var metric = 0;
   for (var i = 0; i < points.length; i++) {
     var point = points[i];
-    var centroid = point.getCentroid();
+    var centroid = point.centroid;
     if (centroid !== undefined) {
       metric += squaredDistance(point, centroid);
     }
