@@ -45,49 +45,12 @@ var points = [];
 
 /* For each point, assign it to the cluster represented by the closest centroid */
 function assignCentroids() {
-  for (var i = points.length - 1; i >= 0; i--) {
-    var point = points[i];
-    point.setCentroid(closestCentroid(point));
-  };
+  
 }
 
 /* Update the position of each centroid based on the points assigned to it. 
   The new position should be the mean of the positions of the points assigned to it.
 */
 function updateCentroids() {
-  for (var i = centroids.length - 1; i >= 0; i--) {
-    var centroid = centroids[i];
-    var sumX = 0;
-    var sumY = 0;
-    var count = 0;
-    for (var j = 0; j < points.length; j++) {
-      point = points[j];
-      if (point.centroid === centroid) {   
-        var point = points[j];
-        sumX += point.x;
-        sumY += point.y;
-        count ++;
-      };
-    };
-    if (count > 0) {
-      centroid.x = sumX / count;
-      centroid.y = sumY / count;
-    };
-  };
+  
 }
-
-
-function closestCentroid(point) {
-  var minDist = Infinity;
-  var closestCentroid;
-  for (var i = centroids.length - 1; i >= 0; i--) {
-    var centroid = centroids[i];
-    var dist = squaredDistance(point, centroid);
-    if (dist < minDist) {
-      minDist = dist;
-      closestCentroid = centroid;
-    }
-  };
-  return closestCentroid;
-}
-
