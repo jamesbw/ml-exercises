@@ -7,7 +7,7 @@ $(function(){
 var X_MAX = 10;
 var Y_MAX = 10;
 
-points = randomData();
+points = examplePoints;
 
 // Generate normally distributed number from Box-Muller transform
 function normal(mu, sigma) {
