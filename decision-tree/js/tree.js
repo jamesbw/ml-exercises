@@ -30,7 +30,7 @@ DecisionTreeNode.prototype.getLabel = function() {
 
 // The variables are used to control the size of the tree
 var MIN_GINI_GAIN = 0;
-var MIN_LEAF_SIZE = 0;
+var MIN_LEAF_SIZE = 1;
 
 /* Splits a leaf node if the current nodes still has both FRAUD and NOT_FRAUD datapoints.
   Returns true if a split has occurred, false otherwise.

@@ -71,6 +71,58 @@ function removeCentroid() {
   redraw();
 }
 
+// Solution implementation if not defined in IMPLEMENT_ME.js
+if (typeof(assignCentroids) !== 'function') {
+  /* For each point, assign it to the cluster represented by the closest centroid */
+  var closestCentroid = function(point) {
+    var minDist = Infinity;
+    var closestCentroid;
+    for (var i = centroids.length - 1; i >= 0; i--) {
+      var centroid = centroids[i];
+      var dist = squaredDistance(point, centroid);
+      if (dist < minDist) {
+        minDist = dist;
+        closestCentroid = centroid;
+      }
+    };
+    return closestCentroid;
+  }
+
+  var assignCentroids = function() {
+    for (var i = points.length - 1; i >= 0; i--) {
+      var point = points[i];
+      point.centroid = closestCentroid(point);
+    };
+  }
+}
+
+if (typeof(updateCentroids) !== 'function') {
+  /* Update the position of each centroid based on the points assigned to it. 
+    The new position should be the mean of the positions of the points assigned to it.
+  */
+  updateCentroids = function() {
+    for (var i = centroids.length - 1; i >= 0; i--) {
+      var centroid = centroids[i];
+      var sumX = 0;
+      var sumY = 0;
+      var count = 0;
+      for (var j = 0; j < points.length; j++) {
+        point = points[j];
+        if (point.centroid === centroid) {   
+          var point = points[j];
+          sumX += point.x;
+          sumY += point.y;
+          count ++;
+        };
+      };
+      if (count > 0) {
+        centroid.x = sumX / count;
+        centroid.y = sumY / count;
+      };
+    };
+  }
+}
+
 function reset() {
   for (var i = points.length - 1; i >= 0; i--) {
     points[i].centroid = undefined;
@@ -211,6 +263,7 @@ function loadExample() {
   reset();
   redraw();
 }
+
 
 //This sets up the listeners for each button
 $('button#reset').click(reset);

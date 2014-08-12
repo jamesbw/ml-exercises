@@ -36,15 +36,15 @@ var Features = Object.freeze({
   For example, if there are 4 fraud datapoints and 6 non-fraud datapoints, the frequency of fraud is 0.4 and the frequency of non-fraud is 0.6.
   The Gini impurity in this case would be 1 - 0.4 * 0.4 - 0.6 * 0.6 = 0.48
 */
-// function calculateGiniImpurityOfSet(datapoints) {
-//   return 0.3;
-// }
+function calculateGiniImpurityOfSet(datapoints) {
+  return 0.314;
+}
 
 /*
   The Gini impurity of a split is the average of the Gini impurities of each subset,
   weighted by the size of each subset.
 */
-// function calculateGiniImpurityOfSplit(datapoints1, datapoints2) {
-//   return 0.12;
-// }
+function calculateGiniImpurityOfSplit(datapoints1, datapoints2) {
+  return 0.137;
+}
 
