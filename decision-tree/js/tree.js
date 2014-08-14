@@ -6,7 +6,7 @@ function Split(feature, splitValue, giniImpurityOfSplit) {
 }
 
 Split.prototype.toString = function() {
-  return this.feature + " < " + this.splitValue;
+  return this.feature + " < " + roundDecimal(this.splitValue, 2);
 };
 
 function DecisionTreeNode(datapoints) {
