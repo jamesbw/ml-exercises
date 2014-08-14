@@ -37,7 +37,24 @@ var Features = Object.freeze({
   The Gini impurity in this case would be 1 - 0.4 * 0.4 - 0.6 * 0.6 = 0.48
 */
 function calculateGiniImpurityOfSet(datapoints) {
-  return 0.314;
+  
+  if (datapoints.length === 0) return 0;
+
+  var fraudFrequency = 0;
+  var notFraudFrequency = 0;
+
+  for (var i = 0; i < datapoints.length; i++) {
+    if (datapoints[i].label === Label.FRAUD) {
+      fraudFrequency++;
+    } else {
+      notFraudFrequency++;
+    }
+  };
+
+  fraudFrequency /= datapoints.length;
+  notFraudFrequency /=datapoints.length;
+
+  return 1 - fraudFrequency * fraudFrequency - notFraudFrequency * notFraudFrequency;
 }
 
 /*
@@ -45,6 +62,12 @@ function calculateGiniImpurityOfSet(datapoints) {
   weighted by the size of each subset.
 */
 function calculateGiniImpurityOfSplit(datapoints1, datapoints2) {
-  return 0.137;
+  var length1 = datapoints1.length;
+  var length2 = datapoints2.length;
+  var totalSize = length1 + length2;
+  var gini1 = calculateGiniImpurityOfSet(datapoints1);
+  var gini2 = calculateGiniImpurityOfSet(datapoints2);
+  return length1 / totalSize * gini1 + length2 / totalSize * gini2; 
 }
+
 
