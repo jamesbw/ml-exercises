@@ -1,7 +1,7 @@
-k-means
+ml-exercises
 =======
 
-A visual demo of the k-means clustering algorithm
+A visual demo of the k-means clustering algorithm and decision tree learning.
 
 Load the index.html file in your browser.
 The exercise is to implement to functions in IMPLEMENT_ME.js
