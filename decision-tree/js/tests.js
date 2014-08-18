@@ -42,28 +42,3 @@ function test_calculateGiniImpurityOfSplit() {
 
 $(test_calculateGiniImpurityOfSet);
 $(test_calculateGiniImpurityOfSplit);
-
-
-/*
-
-Questions:
-what can you limit the tree size by?
- - number of leaves
- - size of leaves
- - max depth
- - gain of split
-
- What do you notice with the error rates when the tree grows?
-  - does the training error go up?
-  - does the CV error go up?
-
-Topics:
- - training: sets, when to stop
- - bagging: random forest
- - boosting: boosting trees
-
-
-  TODO:
-  slides on decision tree
-  clean up k-means
-*/
