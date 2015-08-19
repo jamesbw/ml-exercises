@@ -37,7 +37,9 @@ var Features = Object.freeze({
   The Gini impurity in this case would be 1 - 0.4 * 0.4 - 0.6 * 0.6 = 0.48
 */
 function calculateGiniImpurityOfSet(datapoints) {
-  return 0.314;
+
+  // This currently returns a random value. Obviously, this isn't the right implementation
+  return Math.random();
 }
 
 /*
@@ -45,6 +47,8 @@ function calculateGiniImpurityOfSet(datapoints) {
   weighted by the size of each subset.
 */
 function calculateGiniImpurityOfSplit(datapoints1, datapoints2) {
-  return 0.137;
+  
+  // This currently returns a random value. Obviously, this isn't the right implementation
+  return Math.random();
 }
 
